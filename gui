@@ -1,0 +1,78 @@
+from tkinter import *                  # Importing all functions and classes from the Tkinter library to create the GUI.
+import tkinter.font as FONT             # Importing the FONT module from Tkinter to customize button font.
+import RPi.GPIO as GPIO                 # Importing RPi.GPIO for GPIO control, useful for managing GPIO pins.
+from gpiozero import LED                # Importing the LED class from gpiozero for controlling LEDs.
+
+GPIO.setmode(GPIO.BCM)                  # Setting the GPIO numbering mode to BCM (Broadcom chip-specific pin numbering).
+
+# Initializing LEDs, associating them with specific GPIO pins:
+red_led = LED(17)                       # Red LED connected to GPIO pin 17.
+blue_led = LED(27)                      # Blue LED connected to GPIO pin 27.
+green_led = LED(22)                     # Green LED connected to GPIO pin 22.
+
+# Creating the main window for the GUI:
+win = Tk()                              # Initializing the GUI window.
+win.title("LED FLASHER")                # Setting the title of the window.
+myFont = FONT.Font(family='Helvetica', size=14, weight='bold')  # Customizing the font style for the buttons.
+
+# Function to toggle the Red LED on and off:
+def redLedToggle():
+    if red_led.is_lit:                  # If the red LED is currently on...
+        red_led.off()                   # Turn it off.
+        redLedButton["text"] = "RED LED ON"  # Change the button label to indicate the LED is off (i.e., ready to be turned on).
+    else:
+        red_led.on()                    # Otherwise, turn the red LED on.
+        redLedButton["text"] = "RED LED OFF" # Update the button label to indicate the LED is on.
+    blue_led.off()                      # Ensure the blue LED is turned off when red is on.
+    blueLedButton["text"] = "BLUE LED ON"    # Update the blue button label.
+    green_led.off()                     # Ensure the green LED is turned off when red is on.
+    greenLedButton["text"] = "GREEN LED ON"  # Update the green button label.
+
+# Function to toggle the Blue LED on and off:
+def blueLedToggle():
+    if blue_led.is_lit:                 # If the blue LED is currently on...
+        blue_led.off()                  # Turn it off.
+        blueLedButton["text"] = "BLUE LED ON" # Update the button label to show the LED is off.
+    else:
+        blue_led.on()                   # Otherwise, turn the blue LED on.
+        blueLedButton["text"] = "BLUE LED OFF" # Update the button label to indicate the LED is on.
+    red_led.off()                       # Ensure the red LED is turned off when blue is on.
+    redLedButton["text"] = "RED LED ON"      # Update the red button label.
+    green_led.off()                     # Ensure the green LED is turned off when blue is on.
+    greenLedButton["text"] = "GREEN LED ON"  # Update the green button label.
+
+# Function to toggle the Green LED on and off:
+def greenLedToggle():
+    if green_led.is_lit:                # If the green LED is currently on...
+        green_led.off()                 # Turn it off.
+        greenLedButton["text"] = "GREEN LED ON"  # Update the button label to show the LED is off.
+    else:
+        green_led.on()                  # Otherwise, turn the green LED on.
+        greenLedButton["text"] = "GREEN LED OFF" # Update the button label to indicate the LED is on.
+    red_led.off()                       # Ensure the red LED is turned off when green is on.
+    redLedButton["text"] = "RED LED ON"      # Update the red button label.
+    blue_led.off()                      # Ensure the blue LED is turned off when green is on.
+    blueLedButton["text"] = "BLUE LED ON"    # Update the blue button label.
+
+# Function to handle cleanup and close the window:
+def close():
+    GPIO.cleanup()                      # Clean up GPIO settings before exiting, ensuring the pins are reset.
+    win.destroy()                       # Close the GUI window.
+
+# Creating buttons for each LED and placing them in the GUI grid:
+redLedButton = Button(win, text="RED LED ON", font=myFont, command=redLedToggle, bg='red', height=2, width=30)
+redLedButton.grid(row=0, column=1)      # Place the red LED button in the first row.
+
+blueLedButton = Button(win, text="BLUE LED ON", font=myFont, command=blueLedToggle, bg='blue', height=2, width=30)
+blueLedButton.grid(row=1, column=1)     # Place the blue LED button in the second row.
+
+greenLedButton = Button(win, text="GREEN LED ON", font=myFont, command=greenLedToggle, bg='green', height=2, width=30)
+greenLedButton.grid(row=2, column=1)    # Place the green LED button in the third row.
+
+# Exit button to close the program:
+exitButton = Button(win, text="EXIT", font=myFont, command=close, bg='yellow', height=2, width=30)
+exitButton.grid(row=3, column=1)        # Place the exit button in the fourth row.
+
+# Ensuring proper window closure and GPIO cleanup:
+win.protocol("WM_DELETE_WINDOW", close) # Ensure GPIO cleanup when the window is closed using the window’s 'X' button.
+win.mainloop()                          # Start the main loop of the GUI, keeping the window open until it's closed.
